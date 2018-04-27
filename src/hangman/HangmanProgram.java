@@ -25,13 +25,14 @@ import javax.swing.JSplitPane;
 public class HangmanProgram extends ConsoleProgram{
 
     private HangmanCanvas canvas;
-    final HangmanLexicon WORDS = new HangmanLexicon();
+    HangmanLexicon lexi;
     String theWord;
     String incompleteWord;
     int guessCount;
 
     
     public void startGame(){
+    lexi = new HangmanLexicon("https://raw.githubusercontent.com/atebits/Words/master/Words/en.txt");
         theWord = getWord();
         if(theWord.length() > 0){
             
@@ -51,13 +52,14 @@ public class HangmanProgram extends ConsoleProgram{
         frame.setSize(1024, 900);
         canvas = new HangmanCanvas();
         add(canvas);
+        
         canvas.reset();
         frame.add(this);
         frame.setVisible(true);
         this.setVisible(true);
         canvas.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        canvas.displayWord("Goola");
+
         
     }
     
@@ -69,7 +71,7 @@ public class HangmanProgram extends ConsoleProgram{
     public String getWord(){
         
         try{
-            return WORDS.getWord(new Random().nextInt(9));
+            return lexi.getWord();
         
         }catch(Exception e){
             
@@ -94,7 +96,7 @@ public class HangmanProgram extends ConsoleProgram{
         for(int numOfDashes = theWord.length(); numOfDashes > 0; numOfDashes--){
             incompleteWord += "-";
         }
-        
+        canvas.displayWord(incompleteWord);
 
         
         
@@ -120,8 +122,10 @@ public class HangmanProgram extends ConsoleProgram{
         
         if(!incompleteWord.contains("-"))
             this.println("You win");
-        else if(incompleteWord.contains("-") && guessCount <= 0)
+        else if(incompleteWord.contains("-") && guessCount <= 0){
             this.println("You lose");
+            this.println("The word was: " + theWord);
+        }
         
     }
     
@@ -138,10 +142,10 @@ public class HangmanProgram extends ConsoleProgram{
         
         if(!incompleteWord.contains(guess) && theWord.contains(guess)){
             uncoverLetters(charGuess);
-            
+            canvas.displayWord(incompleteWord);
         }else if(!theWord.contains(guess)){
             guessCount--;
-        
+            canvas.noteIncorrectGuess(charGuess, guessCount);
         }
     }
     
